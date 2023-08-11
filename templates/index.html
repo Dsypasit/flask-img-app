@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8">
       <title>Synchronized Slider</title>
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+      <script src="https://cdn.tailwindcss.com"></script>
       <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
       <script type="text/javascript">
@@ -13,38 +13,35 @@
            var socket = io.connect('http://127.0.0.1:5000');
          
            // An event handler for a change of value 
-           $('input.sync').on('input', function(event) {
-               socket.emit('Slider value changed', {
-                   who: $(this).attr('id'),
-                   data: $(this).val()
+           $('button#submit').on('click', function(event) {
+               socket.emit('chat', {
+                   who: $('input#username').val(),
+                   data: $('#chat-text').val()
                });
+               $('#chat-text').val('')
                return false;
            });
          
-           socket.on('after connect', function(msg) {
-               console.log('After connect', msg);
-           });
-         
-           socket.on('update value', function(msg) {
-               console.log('Slider value updated');
-               $('#' + msg.who).val(msg.data);
+           socket.on('get chat', function(msg) {
+               console.log(msg);
+               $('#chatbox').val($('#chatbox').val()+ '\n' + msg);
            });
          });
       </script>
    </head>
    <body>
-      <div class="container text-center">
-         <h1 >Slider Demo</h1>
-         <form class="mt-5">
-            <div class="form-group">
-               <label for="formControlRange">Demo Slider 1</label>
-               <input type="range" class="form-control-range sync" id="slider1" min="0" max="50" value="{{slider1}}">
-            </div>
-            <div class="form-group">
-               <label for="formControlRange">Demo Slider 2</label>
-               <input type="range" class="form-control-range sync" id="slider2" min="0" max="50" value="{{slider2}}">
-            </div>
-         </form>
+      <div class="container mx-auto">
+         <h1 class="text-5xl mb-5">Slider Demo</h1>
+         <div class="flex flex-col gap-5">
+             <textarea id='chatbox' disabled class="border h-40"></textarea>
+             <div>
+                 <label for="name">name</label>
+                 <input class="border ml-3" type="text" id="username">
+             </div>
+             <label for="name">chat</label>
+             <textarea id="chat-text" class="border"></textarea>
+             <button id='submit' class="border bg-gray-200 py-4 rounded">submit</button>
+         </div>
       </div>
    </body>
 </html>

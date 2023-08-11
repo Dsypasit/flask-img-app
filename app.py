@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 values = {
     'slider1': 25,
@@ -22,6 +23,12 @@ def value_changed(message):
     values[message['who']] = message['data']
     emit('update value', message, broadcast=True)
     print(message)
+
+@socketio.on('chat')
+def chat(message):
+    result = f"{message['who']}: {message['data']}"
+    emit('get chat', result, broadcast=True)
+
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0')
