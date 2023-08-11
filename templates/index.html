@@ -1,47 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>Synchronized Slider</title>
-      <script src="https://cdn.tailwindcss.com"></script>
-      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-      <script type="text/javascript">
-         $(document).ready(function() {
-         
-           // sending a connect request to the server.
-           var socket = io.connect('http://127.0.0.1:5000');
-         
-           // An event handler for a change of value 
-           $('button#submit').on('click', function(event) {
-               socket.emit('chat', {
-                   who: $('input#username').val(),
-                   data: $('#chat-text').val()
-               });
-               $('#chat-text').val('')
-               return false;
-           });
-         
-           socket.on('get chat', function(msg) {
-               console.log(msg);
-               $('#chatbox').val($('#chatbox').val()+ '\n' + msg);
-           });
-         });
-      </script>
-   </head>
-   <body>
-      <div class="container mx-auto">
-         <h1 class="text-5xl mb-5">Slider Demo</h1>
-         <div class="flex flex-col gap-5">
-             <textarea id='chatbox' disabled class="border h-40"></textarea>
-             <div>
-                 <label for="name">name</label>
-                 <input class="border ml-3" type="text" id="username">
-             </div>
-             <label for="name">chat</label>
-             <textarea id="chat-text" class="border"></textarea>
-             <button id='submit' class="border bg-gray-200 py-4 rounded">submit</button>
-         </div>
-      </div>
-   </body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Synchronized Slider</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+                // sending a connect request to the server.
+                var socket = io.connect();
+
+                // An event handler for a change of value 
+                $('button#submit').on('click', function(event) {
+                    socket.emit('chat', {
+                        who: $('input#username').val(),
+                        data: $('#chat-text').val()
+                    });
+                    var chatbox = $('#chat-text');
+                    chatbox.val('');
+                    $('#chat-text').scrollTop(chatbox[0].scrollHeight-chatbox.height());
+                    return false;
+                });
+
+                $('#chat-text').keypress(function(e){
+                    var code = (e.keyCode ? e.keyCode : e.which);
+                    if (code == 13){
+                    socket.emit('chat', {
+                        who: $('input#username').val(),
+                        data: $('#chat-text').val()
+                    });
+                    var chatbox = $('#chat-text');
+                    chatbox.val('');
+                    $('#chat-text').scrollTop(chatbox[0].scrollHeight-chatbox.height());
+                    }
+                })
+
+                socket.on('get chat', function(msg) {
+                    console.log(msg);
+                    $('#chatbox').val($('#chatbox').val()+ '\n' + msg);
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container mx-auto">
+            <h1 class="text-5xl mb-5">Slider Demo</h1>
+            <div class="flex flex-col gap-5">
+                <textarea id='chatbox' disabled class="border h-40"></textarea>
+                <div>
+                    <label for="name">name</label>
+                    <input class="border ml-3" type="text" id="username">
+                </div>
+                <label for="name">chat</label>
+                <textarea id="chat-text" class="border"></textarea>
+                <button id='submit' class="border bg-gray-200 py-4 rounded">submit</button>
+            </div>
+        </div>
+    </body>
 </html>
