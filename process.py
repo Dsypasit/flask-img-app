@@ -1,6 +1,5 @@
 import cv2
 import face_recognition
-from simple_fa
 
 img = cv2.imread('./MESSI.jpg')
 rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
