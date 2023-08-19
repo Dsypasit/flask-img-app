@@ -27,13 +27,7 @@
                 $('#chat-text').keypress(function(e){
                     var code = (e.keyCode ? e.keyCode : e.which);
                     if (code == 13){
-                    socket.emit('chat', {
-                        who: $('input#username').val(),
-                        data: $('#chat-text').val()
-                    });
-                    var chatbox = $('#chat-text');
-                    chatbox.val('');
-                    $('#chat-text').scrollTop(chatbox[0].scrollHeight-chatbox.height());
+                        $('button#submit').trigger('click')
                     }
                 })
 

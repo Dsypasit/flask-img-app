@@ -46,7 +46,10 @@
                         const reader = new FileReader();
                         reader.onload = function(event){
                             const imageBase64 = event.target.result.split(',')[1];
-                            socket.emit('image', imageBase64);
+                            const msg = {
+                                img: imageBase64
+                            }
+                            socket.emit('face', msg);
                             console.log('Image sent');
                         }
 
@@ -58,9 +61,48 @@
                 socket.on('get image', function(msg) {
                     console.log(msg);
                 });
+
+                socket.on('face rect', function(msg) {
+                    console.log('event: face rect')
+                    console.log(msg);
+                    const imageInput = document.getElementById('image-file');
+                    const uploadedImage = document.getElementById('output');
+                    const file = imageInput.files[0];
+                    if (file){
+                        const reader = new FileReader();
+                        reader.onload = function (event){
+                            uploadedImage.src = event.target.result;
+                            console.log("output:", event.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                    const outputContainer = document.getElementById('output-container');
+
+                    let boxs = msg['rect']
+
+                    $("#output-container").find("div").remove();
+
+                    for (box of boxs){
+                        const canvas = document.createElement('div');
+                        let top = box[0];
+                        let left = box[3];
+                        let width = box[1] - box[3];
+                        let height = box[2] - box[0];
+                        console.log(top, left, width, height)
+                        canvas.className = `border-8 absolute`
+                        canvas.style.top = `${top}px`
+                        canvas.style.left = `${left}px`
+                        canvas.style.width = `${width}px`
+                        canvas.style.height = `${height}px`
+                        outputContainer.appendChild(canvas)
+                    }
+                });
             });
         
         </script>
+        <div id='output-container' class="relative">
+            <img src="" alt="" id="output" class="object-contain relative">
+        </div>
     </div>
 </body>
 </html>

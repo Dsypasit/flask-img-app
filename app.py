@@ -3,6 +3,8 @@ from flask_socketio import SocketIO, emit
 import base64
 from io import BytesIO
 from PIL import Image
+import face_recognition
+import numpy as np
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -36,6 +38,12 @@ def image_event(msg):
     image.save('good.jpg')
     emit('get image', {'data': 'save!!'})
 
+def byte_2_img(img):
+    img_byte = base64.b64decode(img)
+
+    image_stream = BytesIO(img_byte)
+    image = Image.open(image_stream)
+    return image
 
 @socketio.on('Slider value changed')
 def value_changed(message):
@@ -47,6 +55,15 @@ def value_changed(message):
 def chat(message):
     result = f"{message['who']}: {message['data']}"
     emit('get chat', result, broadcast=True)
+
+@socketio.on('face')
+def face_img(message):
+    raw_img = message['img']
+    img = byte_2_img(raw_img)
+    np_img = np.array(img)
+    face_locations = face_recognition.face_locations(np_img)
+    result = {'rect': face_locations}
+    return emit('face rect', result)
 
 
 if __name__ == '__main__':
